@@ -1,0 +1,14 @@
+.failure-conainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.retry-button {
+  background-color: #6366f1;
+  border-radius: 5px;
+  height: 30px;
+  border: none;
+  padding: 15px 30px;
+  color: #f1f5f9;
+}

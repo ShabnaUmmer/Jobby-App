@@ -1,0 +1,80 @@
+.job-details {
+  background-color: #202020;
+  color: #f1f5f9;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px;
+}
+
+.company-logo {
+  height: 60px;
+  width: auto;
+}
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.location {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+}
+.above-break {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.break {
+  height: 2px;
+  color: #f1f5f9;
+}
+.indictions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
+.description-link {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+.skillset,
+.similar-jobs {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+}
+
+.life-at-company-section {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.job-details-route {
+  background-color: #000000;
+  color: #f1f5f9;
+
+  margin: 0;
+}
+.job-details-container {
+  background-color: #000000;
+}
+.skill-image {
+  height: 100px;
+  width: auto;
+}
+.skill {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+}

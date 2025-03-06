@@ -1,0 +1,43 @@
+.jobcard {
+  background-color: #202020;
+  color: #f1f5f9;
+  border-radius: 20px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+.jobcard a {
+  text-decoration: none;
+  color: #f1f5f9;
+}
+.company-logo {
+  height: 60px;
+  width: auto;
+}
+.logo-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  align-items: center;
+  justify-content: flex-start;
+}
+.location {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+}
+.above-break {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.break {
+  height: 2px;
+  color: #f1f5f9;
+}
+.indictions {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+}
