@@ -1,15 +1,17 @@
-import NavBar from '../NavBar'
-import FailureView from '../FailureView'
-import {Component} from 'react'
-import {withRouter} from 'react-router-dom'
-import {Redirect} from 'react-router-dom'
-import Cookies from 'js-cookie'
-import Loader from 'react-loader-spinner'
 import {FiStar} from 'react-icons/fi'
 
 import {BsBriefcase} from 'react-icons/bs'
 import {MdLocationOn} from 'react-icons/md'
+import Loader from 'react-loader-spinner'
+import {withRouter, Redirect} from 'react-router-dom'
+import Cookies from 'js-cookie'
+import {Component} from 'react'
+import NavBar from '../NavBar'
+import FailureView from '../FailureView'
+
 import './index.css'
+
+/* eslint-disable camelcase */
 
 class JobDetails extends Component {
   state = {
@@ -22,6 +24,7 @@ class JobDetails extends Component {
   componentDidMount() {
     this.fetchJobDetails()
   }
+
   fetchJobDetails = async () => {
     const {match} = this.props
     const {id} = match.params
@@ -45,6 +48,7 @@ class JobDetails extends Component {
       this.setState({error: true, isLoading: false})
     }
   }
+
   renderLoader = () => (
     <div className="loader-container" data-testid="loader">
       <Loader type="ThreeDots" color="#000000" height={50} width={50} />
@@ -105,7 +109,12 @@ class JobDetails extends Component {
           <div>
             <div className="description-link">
               <h2>Description</h2>
-              <a href={company_website_url} target="_blank">
+              <a
+                href={company_website_url}
+                target="_blank"
+                style={{color: '#1165ed', textDecoration: 'none'}}
+                rel="noreferrer"
+              >
                 Visit
               </a>
             </div>
@@ -180,8 +189,22 @@ class JobDetails extends Component {
       </div>
     )
   }
-  render() {
+
+  renderContent = () => {
     const {isLoading, error} = this.state
+
+    if (isLoading) {
+      return this.renderLoader()
+    }
+
+    if (error) {
+      return <FailureView onRetry={this.fetchJobDetails} />
+    }
+
+    return this.renderJobDetails()
+  }
+
+  render() {
     const jwtToken = Cookies.get('jwt_token')
     if (jwtToken === undefined) {
       return <Redirect to="/login" />
@@ -189,15 +212,7 @@ class JobDetails extends Component {
     return (
       <div className="job-details-container">
         <NavBar />
-        <div className="job-details-route">
-          {isLoading ? (
-            this.renderLoader()
-          ) : error ? (
-            <FailureView onRetry={this.fetchJobDetails} />
-          ) : (
-            this.renderJobDetails()
-          )}
-        </div>
+        <div className="job-details-route">{this.renderContent()}</div>
       </div>
     )
   }

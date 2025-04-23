@@ -1,12 +1,12 @@
 import {Component} from 'react'
 import Cookies from 'js-cookie'
 import {Redirect} from 'react-router-dom'
+import Loader from 'react-loader-spinner'
+import {BsSearch} from 'react-icons/bs'
 import JobCard from '../JobCard'
 import Profile from '../Profile'
 import NavBar from '../NavBar'
 import FailureView from '../FailureView'
-import Loader from 'react-loader-spinner'
-import {BsSearch} from 'react-icons/bs'
 import './index.css'
 
 const employmentTypesList = [
@@ -47,25 +47,57 @@ const salaryRangesList = [
   },
 ]
 
+const locationsList = [
+  {
+    locationId: 'HYDERABAD',
+    label: 'Hyderabad',
+  },
+  {
+    locationId: 'BANGALORE',
+    label: 'Bangalore',
+  },
+  {
+    locationId: 'CHENNAI',
+    label: 'Chennai',
+  },
+  {
+    locationId: 'DELHI',
+    label: 'Delhi',
+  },
+  {
+    locationId: 'MUMBAI',
+    label: 'Mumbai',
+  },
+]
+
 class JobRoute extends Component {
   state = {
     jobsList: [],
     employmentFilters: [],
     salaryFilters: '',
+    locationFilters: [],
     isLoading: false,
     error: false,
     search: '',
   }
+
   componentDidMount() {
     this.fetchJobs()
   }
+
   fetchJobs = async () => {
-    const {employmentFilters, salaryFilters, search} = this.state
+    const {
+      employmentFilters,
+      salaryFilters,
+      search,
+      locationFilters,
+    } = this.state
     this.setState({isLoading: true, error: false})
 
     let apiUrl = `https://apis.ccbp.in/jobs?search=${search}`
-    apiUrl += `&employment_type=${employmentFilters.join(',')}` // Always include employment_type=
+    apiUrl += `&employment_type=${employmentFilters.join(',')}`
     apiUrl += `&minimum_package=${salaryFilters}`
+    apiUrl += `&location=${locationFilters.join(',')}`
 
     const jwtToken = Cookies.get('jwt_token')
     const options = {
@@ -76,13 +108,13 @@ class JobRoute extends Component {
     }
     const response = await fetch(apiUrl, options)
     const data = await response.json()
-    console.log('API Response:', data)
     if (response.ok) {
       this.setState({jobsList: data.jobs, isLoading: false})
     } else {
       this.setState({error: true, isLoading: false})
     }
   }
+
   handleEmploymentFilterChange = event => {
     const {employmentFilters} = this.state
     const {value, checked} = event.target
@@ -93,24 +125,38 @@ class JobRoute extends Component {
 
     this.setState({employmentFilters: updatedFilters}, this.fetchJobs)
   }
+
   handleSalaryFilterChange = event => {
     const {value} = event.target
     this.setState({salaryFilters: value}, this.fetchJobs)
   }
+
+  handleLocationFilterChange = event => {
+    const {locationFilters} = this.state
+    const {value, checked} = event.target
+
+    const updatedFilters = checked
+      ? [...locationFilters, value]
+      : locationFilters.filter(id => id !== value)
+
+    this.setState({locationFilters: updatedFilters}, this.fetchJobs)
+  }
+
   onSearch = event => {
     this.setState({search: event.target.value})
   }
+
   searchSubmit = event => {
     event.preventDefault()
     this.fetchJobs()
   }
-  renderLoader = () => {
-    return (
-      <div className="loader-container" data-testid="loader">
-        <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
-      </div>
-    )
-  }
+
+  renderLoader = () => (
+    <div className="loader-container" data-testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height="50" width="50" />
+    </div>
+  )
+
   renderNoJobsView = () => (
     <div>
       <img
@@ -121,6 +167,7 @@ class JobRoute extends Component {
       <p>We could not find any jobs. Try other filters.</p>
     </div>
   )
+
   renderJobsList = () => {
     const {jobsList} = this.state
     if (jobsList.length === 0) {
@@ -137,8 +184,22 @@ class JobRoute extends Component {
     )
   }
 
+  renderContent = () => {
+    const {isLoading, error} = this.state
+
+    if (isLoading) {
+      return this.renderLoader()
+    }
+
+    if (error) {
+      return <FailureView onRetry={this.fetchJobs} />
+    }
+
+    return this.renderJobsList()
+  }
+
   render() {
-    const {jobsList, isLoading, error, search} = this.state
+    const {search} = this.state
     const jwtToken = Cookies.get('jwt_token')
     if (jwtToken === undefined) {
       return <Redirect to="/login" />
@@ -186,6 +247,25 @@ class JobRoute extends Component {
                   </li>
                 ))}
               </ul>
+
+              <hr className="break" />
+
+              <h3>Locations</h3>
+              <ul className="filter-list">
+                {locationsList.map(({locationId, label}) => (
+                  <li key={locationId}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value={locationId}
+                        onChange={this.handleLocationFilterChange}
+                      />
+                      {label}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <hr className="break" />
             </div>
           </div>
 
@@ -208,15 +288,7 @@ class JobRoute extends Component {
                 <BsSearch className="search-icon" />
               </button>
             </div>
-            <div className="jobs-list">
-              {isLoading ? (
-                this.renderLoader()
-              ) : error ? (
-                <FailureView onRetry={this.fetchJobs} />
-              ) : (
-                this.renderJobsList()
-              )}
-            </div>
+            <div className="jobs-list">{this.renderContent()}</div>
           </div>
         </div>
       </div>

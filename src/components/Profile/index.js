@@ -10,6 +10,7 @@ class Profile extends Component {
     isLoading: true,
     error: false,
   }
+
   componentDidMount() {
     this.fetchProfile()
   }
@@ -36,13 +37,13 @@ class Profile extends Component {
       this.setState({error: true, isLoading: false})
     }
   }
-  renderLoader = () => {
-    return (
-      <div className="loader-container" data-testid="loader">
-        <Loader type="ThreeDots" color="#ffffff" height={50} width={50} />
-      </div>
-    )
-  }
+
+  renderLoader = () => (
+    <div className="loader-container" data-testid="loader">
+      <Loader type="ThreeDots" color="#ffffff" height={50} width={50} />
+    </div>
+  )
+
   render() {
     const {profile, isLoading, error} = this.state
     const jwtToken = Cookies.get('jwt_token')
@@ -56,7 +57,9 @@ class Profile extends Component {
     if (error) {
       return (
         <div>
-          <button onClick={this.fetchProfile}>Retry</button>
+          <button type="button" onClick={this.fetchProfile}>
+            Retry
+          </button>
         </div>
       )
     }

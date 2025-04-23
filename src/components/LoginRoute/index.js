@@ -15,6 +15,7 @@ class LoginRoute extends Component {
   onChangeUsername = event => {
     this.setState({username: event.target.value})
   }
+
   onChangePassword = event => {
     this.setState({password: event.target.value})
   }
@@ -24,9 +25,11 @@ class LoginRoute extends Component {
     Cookies.set('jwt_token', jwtToken, {expires: 30})
     history.replace('/')
   }
+
   onSubmitFailure = errorMsg => {
     this.setState({isError: true, errorMsg})
   }
+
   submitForm = async event => {
     event.preventDefault()
     const {username, password} = this.state
@@ -45,6 +48,7 @@ class LoginRoute extends Component {
       this.onSubmitFailure(data.error_msg)
     }
   }
+
   renderUsernameField = () => {
     const {username} = this.state
 
@@ -64,6 +68,7 @@ class LoginRoute extends Component {
       </>
     )
   }
+
   renderPasswordField = () => {
     const {password} = this.state
 
@@ -83,6 +88,7 @@ class LoginRoute extends Component {
       </>
     )
   }
+
   render() {
     const {isError, errorMsg} = this.state
     const jwtToken = Cookies.get('jwt_token')
