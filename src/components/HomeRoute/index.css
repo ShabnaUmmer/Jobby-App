@@ -21,6 +21,7 @@
   border: none;
   padding: 10px 20px;
   color: #f1f5f9;
+  cursor:pointer;
 }
 .home-container a {
   text-decoration: none;
