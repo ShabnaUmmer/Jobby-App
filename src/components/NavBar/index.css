@@ -28,9 +28,11 @@
   padding: 15px 30px;
   color: #f1f5f9;
   margin-right: 40px;
+  cursor: pointer;
 }
 .nav-items {
   display: flex;
   flex-direction: row;
   gap: 40px;
+  cursor: pointer;
 }
