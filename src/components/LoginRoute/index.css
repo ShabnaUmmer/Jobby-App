@@ -39,6 +39,7 @@
   padding: 10px 20px;
   background-color: transparent;
   color: #f1f5f9;
+  cursor: pointer;
 }
 .input-field:focus {
   background-color: transparent;
@@ -54,6 +55,7 @@
   border: none;
   width: 100%;
   color: #f1f5f9;
+  cursor: pointer;
 }
 .error-message {
   color: #ed1c05;
