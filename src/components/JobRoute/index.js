@@ -221,6 +221,7 @@ class JobRoute extends Component {
                       <input
                         type="checkbox"
                         value={employmentTypeId}
+                        style={{cursor: 'pointer'}}
                         onChange={this.handleEmploymentFilterChange}
                       />
                       {label}
@@ -240,6 +241,7 @@ class JobRoute extends Component {
                         type="radio"
                         name="salary"
                         value={salaryRangeId}
+                        style={{cursor: 'pointer'}}
                         onChange={this.handleSalaryFilterChange}
                       />
                       {label}
@@ -258,6 +260,7 @@ class JobRoute extends Component {
                       <input
                         type="checkbox"
                         value={locationId}
+                        style={{cursor: 'pointer'}}
                         onChange={this.handleLocationFilterChange}
                       />
                       {label}
