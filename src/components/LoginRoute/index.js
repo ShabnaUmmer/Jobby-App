@@ -1,7 +1,9 @@
 import {Component} from 'react'
-import {Redirect} from 'react-router-dom'
+import {Link} from 'react-router-dom'
 import Cookies from 'js-cookie'
-
+import { FaEye, FaEyeSlash, FaLock } from 'react-icons/fa'
+import { HiUser } from 'react-icons/hi'
+import apiService from '../../services/api'
 import './index.css'
 
 class LoginRoute extends Component {
@@ -10,110 +12,146 @@ class LoginRoute extends Component {
     password: '',
     isError: false,
     errorMsg: '',
+    isLoading: false,
+    showPassword: false,
   }
 
-  onChangeUsername = event => {
-    this.setState({username: event.target.value})
+  onChangeUsername = (event) => {
+    this.setState({username: event.target.value, isError: false, errorMsg: ''})
   }
 
-  onChangePassword = event => {
-    this.setState({password: event.target.value})
+  onChangePassword = (event) => {
+    this.setState({password: event.target.value, isError: false, errorMsg: ''})
   }
 
-  onSubmitSuccess = jwtToken => {
+  togglePasswordVisibility = () => {
+    this.setState(prev => ({ showPassword: !prev.showPassword }))
+  }
+
+  onSubmitSuccess = (jwtToken) => {
     const {history} = this.props
     Cookies.set('jwt_token', jwtToken, {expires: 30})
     history.replace('/')
   }
 
-  onSubmitFailure = errorMsg => {
-    this.setState({isError: true, errorMsg})
+  onSubmitFailure = (errorMsg) => {
+    this.setState({isError: true, errorMsg, isLoading: false})
   }
 
-  submitForm = async event => {
+  submitForm = async (event) => {
     event.preventDefault()
     const {username, password} = this.state
-    const userDetails = {username, password}
-    const apiUrl = 'https://apis.ccbp.in/login'
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(userDetails),
+    
+    if (!username.trim()) {
+      this.onSubmitFailure('Username is required')
+      return
     }
-    const response = await fetch(apiUrl, options)
-    const data = await response.json()
-
-    if (response.ok) {
-      this.onSubmitSuccess(data.jwt_token)
-    } else {
-      this.onSubmitFailure(data.error_msg)
+    
+    if (!password.trim()) {
+      this.onSubmitFailure('Password is required')
+      return
     }
-  }
-
-  renderUsernameField = () => {
-    const {username} = this.state
-
-    return (
-      <>
-        <label className="input-label" htmlFor="username">
-          USERNAME
-        </label>
-        <input
-          type="text"
-          id="username"
-          className="input-field"
-          value={username}
-          onChange={this.onChangeUsername}
-          placeholder="Username"
-        />
-      </>
-    )
-  }
-
-  renderPasswordField = () => {
-    const {password} = this.state
-
-    return (
-      <>
-        <label className="input-label" htmlFor="password">
-          PASSWORD
-        </label>
-        <input
-          type="password"
-          id="password"
-          className="input-field"
-          value={password}
-          onChange={this.onChangePassword}
-          placeholder="Password"
-        />
-      </>
-    )
+    
+    this.setState({isLoading: true, isError: false, errorMsg: ''})
+    
+    try {
+      const result = await apiService.login({username, password})
+      if (result.jwt_token) {
+        this.onSubmitSuccess(result.jwt_token)
+      }
+    } catch (error) {
+      this.onSubmitFailure(error.error_msg || 'Login failed!')
+      this.setState({isLoading: false})
+    }
   }
 
   render() {
-    const {isError, errorMsg} = this.state
+    const {username, password, isError, errorMsg, isLoading, showPassword} = this.state
     const jwtToken = Cookies.get('jwt_token')
 
     if (jwtToken !== undefined) {
-      return <Redirect to="/" />
+      const {history} = this.props
+      history.replace('/')
+      return null
     }
 
     return (
       <div className="login-container">
-        <form onSubmit={this.submitForm} className="form-container">
+        <div className="login-form-container">
           <img
             src="https://assets.ccbp.in/frontend/react-js/logo-img.png"
             alt="website logo"
-            className="website-logo"
+            className="login-website-logo"
           />
-          <div className="input-container">{this.renderUsernameField()}</div>
-          <div className="input-container">{this.renderPasswordField()}</div>
-          <button type="submit" className="login-button">
-            Login
-          </button>
-          {isError && <p className="error-message">*{errorMsg}</p>}
-        </form>
+          
+          <form onSubmit={this.submitForm} className="login-form">
+            <div className="login-input-container">
+              <label className="login-input-label" htmlFor="username">
+                USERNAME
+              </label>
+              <div className="input-icon-wrapper">
+                <HiUser className="input-icon" />
+                <input
+                  type="text"
+                  id="username"
+                  className="login-input-field"
+                  value={username}
+                  onChange={this.onChangeUsername}
+                  placeholder="Enter username"
+                />
+              </div>
+            </div>
+            
+            <div className="login-input-container">
+              <label className="login-input-label" htmlFor="password">
+                PASSWORD
+              </label>
+              <div className="input-icon-wrapper">
+                <FaLock className="input-icon" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="password"
+                  className="login-input-field"
+                  value={password}
+                  onChange={this.onChangePassword}
+                  placeholder="Enter password"
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={this.togglePasswordVisibility}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
+            </div>
+            
+            <button
+              type="submit"
+              className="login-button"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="login-loader"></div>
+              ) : (
+                'Login'
+              )}
+            </button>
+            
+            {isError && (
+              <p className="login-error-message">
+                {errorMsg}
+              </p>
+            )}
+            
+            <p className="login-auth-footer">
+              Don't have an account? <Link to="/register">Register here</Link>
+            </p>
+          </form>
+        </div>
       </div>
     )
   }
 }
+
 export default LoginRoute

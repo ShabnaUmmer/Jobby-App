@@ -1,17 +1,14 @@
-import {FiStar} from 'react-icons/fi'
-
-import {BsBriefcase} from 'react-icons/bs'
-import {MdLocationOn} from 'react-icons/md'
-import Loader from 'react-loader-spinner'
-import {withRouter, Redirect} from 'react-router-dom'
-import Cookies from 'js-cookie'
 import {Component} from 'react'
+import {Redirect} from 'react-router-dom'
+import Cookies from 'js-cookie'
+import { TailSpin } from 'react-loader-spinner'
+import { FiStar } from 'react-icons/fi'
+import { BsBriefcase } from 'react-icons/bs'
+import { MdLocationOn } from 'react-icons/md'
 import NavBar from '../NavBar'
 import FailureView from '../FailureView'
-
+import apiService from '../../services/api'
 import './index.css'
-
-/* eslint-disable camelcase */
 
 class JobDetails extends Component {
   state = {
@@ -26,41 +23,41 @@ class JobDetails extends Component {
   }
 
   fetchJobDetails = async () => {
-    const {match} = this.props
-    const {id} = match.params
+    const { match } = this.props
+    const { id } = match.params
     const jwtToken = Cookies.get('jwt_token')
-    const apiUrl = `https://apis.ccbp.in/jobs/${id}`
-    const options = {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
+    
+    if (!jwtToken) {
+      this.setState({ error: true, isLoading: false })
+      return
     }
-    const response = await fetch(apiUrl, options)
-    const data = await response.json()
-    if (response.ok) {
+    
+    try {
+      const data = await apiService.fetchJobById(id)
+      
       this.setState({
         jobDetails: data.job_details,
-        similarJobs: data.similar_jobs,
+        similarJobs: data.similar_jobs || [],
         isLoading: false,
       })
-    } else {
-      this.setState({error: true, isLoading: false})
+    } catch (error) {
+      this.setState({ error: true, isLoading: false })
     }
   }
 
   renderLoader = () => (
     <div className="loader-container" data-testid="loader">
-      <Loader type="ThreeDots" color="#000000" height={50} width={50} />
+      <TailSpin color="#6366f1" height={50} width={50} />
     </div>
   )
 
   renderJobDetails = () => {
-    const {jobDetails, similarJobs} = this.state
+    const { jobDetails, similarJobs } = this.state
 
     if (!jobDetails) {
-      return <p>Job details not available.</p>
+      return null
     }
+
     const {
       company_logo_url,
       company_website_url,
@@ -72,126 +69,167 @@ class JobDetails extends Component {
       package_per_annum,
       skills,
       life_at_company,
+      experience_required,
+      requirements,
+      date_posted,
+      deadline,
+      company_name
     } = jobDetails
 
+    const getEmploymentTypeLabel = () => {
+      switch(employment_type) {
+        case 'FULLTIME': return 'Full Time';
+        case 'PARTTIME': return 'Part Time';
+        case 'FREELANCE': return 'Freelance';
+        case 'INTERNSHIP': return 'Internship';
+        default: return employment_type;
+      }
+    }
+
     return (
-      <div>
-        <div className="job-details">
-          <div className="logo-container">
-            <img
-              src={company_logo_url}
-              alt="job details company logo"
-              className="company-logo"
+      <div className="job-details-wrapper">
+        <div className="job-details-card">
+          <div className="job-details-header">
+            <img 
+              src={company_logo_url} 
+              alt="company logo" 
+              className="job-details-logo"
+              onError={(e) => {
+                e.target.src = `https://img.icons8.com/color/240/${company_name?.toLowerCase()}.png`;
+                e.target.onerror = () => {
+                  e.target.src = "https://img.icons8.com/color/240/company.png";
+                };
+              }}
             />
             <div>
               <h2>{title}</h2>
-              <div>
-                <p>
-                  <FiStar color="#fbbf24" fill="#fbbf24" /> {rating}
-                </p>
+              <p className="company-name">{company_name}</p>
+              <div className="job-details-rating">
+                <FiStar className="star-icon" />
+                <span>{rating}</span>
               </div>
             </div>
           </div>
-          <div className="above-break">
-            <div className="location">
-              <p className="indictions">
-                <MdLocationOn />
-                {location}
-              </p>
-              <p className="indictions">
-                <BsBriefcase color="#121212" fill="#f1f5f9" />
-                {employment_type}
-              </p>
+          
+          <div className="job-details-meta">
+            <div className="meta-left">
+              <span><MdLocationOn /> {location}</span>
+              <span><BsBriefcase /> {getEmploymentTypeLabel()}</span>
+              <span>📅 {date_posted}</span>
+              <span>⏰ Deadline: {deadline}</span>
             </div>
-            <p>{package_per_annum}</p>
+            <p className="meta-salary">{package_per_annum}</p>
           </div>
-          <hr className="break" />
-          <div>
-            <div className="description-link">
-              <h2>Description</h2>
-              <a
-                href={company_website_url}
-                target="_blank"
-                style={{color: '#1165ed', textDecoration: 'none'}}
-                rel="noreferrer"
-              >
-                Visit
+          
+          <div className="experience-badge">
+            💼 Experience Required: {experience_required}
+          </div>
+          
+          <hr className="divider" />
+          
+          <div className="job-details-description">
+            <div className="description-header">
+              <h3>Description</h3>
+              <a href={company_website_url} target="_blank" rel="noreferrer" className="visit-link">
+                Visit Company Website
               </a>
             </div>
             <p>{job_description}</p>
           </div>
-          <div className="skills-section">
-            <h3>Skills</h3>
-            <ul className="skillset">
-              {skills.map(skill => (
-                <li key={skill.name} className="skill">
-                  <img
-                    src={skill.image_url}
-                    className="skill-image"
-                    alt={skill.name}
-                  />
-                  <p>{skill.name}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <h3>Life at Company</h3>
-            <div className="life-at-company-section">
-              <p>{life_at_company.description}</p>
-              <img src={life_at_company.image_url} alt="life at company" />
+          
+          {requirements && requirements.length > 0 && (
+            <div className="requirements-section">
+              <h3>Requirements</h3>
+              <ul className="requirements-list">
+                {requirements.map((req, index) => (
+                  <li key={index}>
+                    ✅ {req}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-        </div>
-        <h2 style={{paddingLeft: '40px'}}>Similar Jobs</h2>
-        <div>
-          <div className="similar-jobs-section">
-            <ul className="similar-jobs">
-              {similarJobs.map(job => (
-                <li key={job.id} className="job-details">
-                  <div className="logo-container">
-                    <img
-                      src={job.company_logo_url}
-                      alt="similar job company logo"
-                      className="company-logo"
-                    />
-                    <div>
-                      <h2>{job.title}</h2>
-                      <div>
-                        <p>
-                          <FiStar color="#fbbf24" fill="#fbbf24" /> {job.rating}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h3>Description</h3>
-                    <p>{job.job_description}</p>
-                  </div>
-                  <div className="above-break">
-                    <div className="location">
-                      <p className="indictions">
-                        <MdLocationOn />
-                        {job.location}
-                      </p>
-                      <p className="indictions">
-                        <BsBriefcase color="#121212" fill="#f1f5f9" />
-                        {job.employment_type}
-                      </p>
-                    </div>
-                    <p>{job.package_per_annum}</p>
-                  </div>
+          )}
+          
+          <div className="skills-section">
+            <h3>Skills Required</h3>
+            <ul className="skills-list">
+              {skills && skills.map(skill => (
+                <li key={skill.name} className="skill-item">
+                  <img src={skill.image_url} alt={skill.name} />
+                  <span>{skill.name}</span>
                 </li>
               ))}
             </ul>
           </div>
+          
+          {life_at_company && (
+            <div className="life-at-company">
+              <h3>Life at Company</h3>
+              <div className="life-content">
+                <p>{life_at_company.description}</p>
+                <img src={life_at_company.image_url} alt="life at company" />
+              </div>
+            </div>
+          )}
+          
+          <div className="apply-section">
+            <button 
+              className="apply-button"
+              onClick={() => window.open(company_website_url, '_blank')}
+            >
+              Apply Now
+            </button>
+          </div>
         </div>
+        
+        {similarJobs.length > 0 && (
+          <>
+            <h2 className="similar-jobs-title">Similar Jobs</h2>
+            <div className="similar-jobs-container">
+              {similarJobs.map(job => (
+                <div 
+                  key={job.id} 
+                  className="similar-job-card"
+                  onClick={() => {
+                    const { history } = this.props
+                    history.push(`/jobs/${job.id}`)
+                  }}
+                >
+                  <img 
+                    src={job.company_logo_url} 
+                    alt={job.title} 
+                    className="similar-job-logo"
+                    onError={(e) => {
+                      e.target.src = `https://img.icons8.com/color/240/${job.company_name?.toLowerCase()}.png`;
+                    }}
+                  />
+                  <h3>{job.title}</h3>
+                  <p className="company-name">{job.company_name}</p>
+                  <div className="similar-job-rating">
+                    <FiStar className="star-icon" />
+                    <span>{job.rating}</span>
+                  </div>
+                  <p className="similar-job-description">{job.job_description?.substring(0, 100)}...</p>
+                  <div className="similar-job-meta">
+                    <span><MdLocationOn /> {job.location}</span>
+                    <span><BsBriefcase /> {
+                      job.employment_type === 'FULLTIME' ? 'Full Time' :
+                      job.employment_type === 'PARTTIME' ? 'Part Time' :
+                      job.employment_type === 'FREELANCE' ? 'Freelance' : 'Internship'
+                    }</span>
+                  </div>
+                  <p className="similar-job-salary">{job.package_per_annum}</p>
+                </div>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     )
   }
 
   renderContent = () => {
-    const {isLoading, error} = this.state
+    const { isLoading, error } = this.state
 
     if (isLoading) {
       return this.renderLoader()
@@ -209,12 +247,16 @@ class JobDetails extends Component {
     if (jwtToken === undefined) {
       return <Redirect to="/login" />
     }
+    
     return (
-      <div className="job-details-container">
+      <div className="job-details-page">
         <NavBar />
-        <div className="job-details-route">{this.renderContent()}</div>
+        <div className="job-details-content">
+          {this.renderContent()}
+        </div>
       </div>
     )
   }
 }
-export default withRouter(JobDetails)
+
+export default JobDetails

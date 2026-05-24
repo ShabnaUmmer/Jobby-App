@@ -1,31 +1,58 @@
-import Cookies from 'js-cookie'
-import {Redirect, Link} from 'react-router-dom'
-
+import {Component} from 'react'
+import {Link} from 'react-router-dom'
 import NavBar from '../NavBar'
 import './index.css'
 
-const HomeRoute = () => {
-  const jwtToken = Cookies.get('jwt_token')
-  if (jwtToken === undefined) {
-    return <Redirect to="/login" />
-  }
-
-  return (
-    <>
-      <NavBar />
+class HomeRoute extends Component {
+  render() {
+    return (
       <div className="home-container">
-        <h1>Find the Job that Fits Your Life</h1>
-        <p>
-          Millions of people are searching for jobs, salary, information,
-          company reviews. Find the job that fits your abilities and potential.
-        </p>
-        <Link to="/jobs">
-          <button type="button" className="job-button">
-            Find Jobs
-          </button>
-        </Link>
+        <NavBar />
+        
+        <div className="animated-bg">
+          <div className="floating-circle circle-1"></div>
+          <div className="floating-circle circle-2"></div>
+          <div className="floating-circle circle-3"></div>
+        </div>
+        
+        <div className="home-content">
+          <div className="home-text">
+            <h1 className="home-title">
+              Find Your
+              <span className="gradient-text"> Dream Job</span>
+            </h1>
+            
+            <p className="home-description">
+              Discover thousands of job opportunities with top companies. 
+              Find the perfect role that matches your skills and career goals.
+            </p>
+            
+            <Link to="/jobs">
+              <button className="home-button">
+                Find Jobs
+                <span className="button-arrow">→</span>
+              </button>
+            </Link>
+          </div>
+          
+          <div className="stats-container">
+            <div className="stat-card">
+              <h3>10K+</h3>
+              <p>Job Openings</p>
+            </div>
+            <div className="stat-card">
+              <h3>500+</h3>
+              <p>Companies</p>
+            </div>
+            <div className="stat-card">
+              <h3>50K+</h3>
+              <p>Active Users</p>
+            </div>
+          </div>
+        </div>
       </div>
-    </>
-  )
+    )
+  }
 }
+
 export default HomeRoute

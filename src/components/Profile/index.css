@@ -1,13 +1,160 @@
 .profile-container {
-  background-image: url('https://assets.ccbp.in/frontend/react-js/profile-bg.png');
-  padding: 10px;
-  margin: 10px;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2d2d3f 100%);
   border-radius: 20px;
-  background-size: cover;
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
+  text-align: center;
 }
-.profile-container h2 {
+
+.profile-container:hover {
+  transform: translateY(-5px);
+  border-color: #6366f1;
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.15);
+}
+
+/* Avatar Wrapper */
+.profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.profile-initial-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  border: 3px solid #ffffff;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+  animation: float 3s ease-in-out infinite;
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-initial-circle:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.4);
+}
+
+.profile-online-dot {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 14px;
+  height: 14px;
+  background-color: #22c55e;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+.profile-name {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.profile-email {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 12px;
+  color: #cbd5e1;
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.email-icon {
   color: #6366f1;
+  font-size: 14px;
+  min-width: 16px;
 }
-.profile-container p {
-  color: #64748b;
+
+.profile-loader-container,
+.profile-error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  background: rgba(30, 41, 59, 0.6);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  border: none;
+  border-radius: 12px;
+  padding: 10px 24px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px;
+  }
+  
+  .profile-initial-circle {
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+  }
+  
+  .profile-name {
+    font-size: 16px;
+  }
+  
+  .profile-email {
+    font-size: 11px;
+    padding: 6px 10px;
+  }
+  
+  .email-icon {
+    font-size: 12px;
+  }
 }

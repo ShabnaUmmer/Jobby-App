@@ -1,14 +1,34 @@
-.failure-conainer {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+.failure-view {
+  text-align: center;
+  padding: 60px 20px;
 }
-.retry-button {
-  background-color: #6366f1;
-  border-radius: 5px;
-  height: 30px;
+
+.failure-image {
+  width: 400px;
+  max-width: 90%;
+  margin-bottom: 30px;
+}
+
+.failure-view h1 {
+  font-size: 28px;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+.failure-view p {
+  font-size: 16px;
+  color: #94a3b8;
+  margin-bottom: 30px;
+}
+
+.retry-button-large {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
   border: none;
-  padding: 15px 30px;
-  color: #f1f5f9;
+  border-radius: 8px;
+  padding: 12px 32px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }

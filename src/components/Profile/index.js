@@ -1,7 +1,8 @@
 import {Component} from 'react'
-import Loader from 'react-loader-spinner'
+import {TailSpin} from 'react-loader-spinner'
 import Cookies from 'js-cookie'
-import {Redirect} from 'react-router-dom'
+import { FaUserCircle, FaEnvelope } from 'react-icons/fa'
+import apiService from '../../services/api'
 import './index.css'
 
 class Profile extends Component {
@@ -9,67 +10,123 @@ class Profile extends Component {
     profile: null,
     isLoading: true,
     error: false,
+    userInitial: '',
+    userName: '',
+    userEmail: '',
   }
 
   componentDidMount() {
     this.fetchProfile()
+    this.getUserInfo()
+  }
+
+  getUserInfo = () => {
+    const currentUser = localStorage.getItem('currentUser')
+    if (currentUser) {
+      const user = JSON.parse(currentUser)
+      const name = user.name || user.username
+      const initial = name.charAt(0).toUpperCase()
+      this.setState({ 
+        userInitial: initial,
+        userName: name,
+        userEmail: user.email || '',
+      })
+    }
   }
 
   fetchProfile = async () => {
     const jwtToken = Cookies.get('jwt_token')
-    this.setState({isLoading: true, error: false})
-    const profileUrl = 'https://apis.ccbp.in/profile'
-    const options = {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${jwtToken}`,
-      },
+    
+    if (!jwtToken) {
+      this.setState({ error: true, isLoading: false })
+      return
     }
-    const response = await fetch(profileUrl, options)
-    const data = await response.json()
-    if (response.ok) {
-      this.setState({
-        profile: data.profile_details,
-        error: false,
-        isLoading: false,
-      })
-    } else {
-      this.setState({error: true, isLoading: false})
+    
+    this.setState({ isLoading: true, error: false })
+    
+    try {
+      const data = await apiService.fetchProfile(jwtToken)
+      
+      if (data.profile_details) {
+        const profileName = data.profile_details.name
+        const profileEmail = data.profile_details.email
+        
+        if (profileName) {
+          const initial = profileName.charAt(0).toUpperCase()
+          this.setState({ 
+            userInitial: initial,
+            userName: profileName,
+            userEmail: profileEmail || '',
+          })
+        }
+        
+        this.setState({
+          profile: data.profile_details,
+          error: false,
+          isLoading: false,
+        })
+      }
+    } catch (error) {
+      this.getUserInfo()
+      this.setState({ error: false, isLoading: false })
     }
   }
 
   renderLoader = () => (
-    <div className="loader-container" data-testid="loader">
-      <Loader type="ThreeDots" color="#ffffff" height={50} width={50} />
+    <div className="profile-loader-container">
+      <TailSpin color="#6366f1" height={40} width={40} />
     </div>
   )
 
-  render() {
-    const {profile, isLoading, error} = this.state
-    const jwtToken = Cookies.get('jwt_token')
-    if (jwtToken === undefined) {
-      return <Redirect to="/login" />
-    }
-    if (isLoading) {
-      return <div>{this.renderLoader()}</div>
-    }
+  renderError = () => (
+    <div className="profile-error-container">
+      <button 
+        type="button" 
+        onClick={this.fetchProfile} 
+        className="retry-button"
+      >
+        Retry
+      </button>
+    </div>
+  )
 
-    if (error) {
-      return (
-        <div>
-          <button type="button" onClick={this.fetchProfile}>
-            Retry
-          </button>
-        </div>
-      )
-    }
+  renderProfile = () => {
+    const { userInitial, userName, userEmail } = this.state
+    const displayName = userName || 'User'
+    const displayEmail = userEmail || 'No email provided'
+    
     return (
       <div className="profile-container">
-        <img src={profile.profile_image_url} alt="profile" width={100} />
-        <h2>{profile.name}</h2>
-        <p>{profile.short_bio}</p>
+        <div className="profile-avatar-wrapper">
+          <div className="profile-initial-circle">
+            {userInitial || <FaUserCircle />}
+          </div>
+          <div className="profile-online-dot"></div>
+        </div>
+        
+        <h2 className="profile-name">{displayName}</h2>
+        
+        <div className="profile-email">
+          <FaEnvelope className="email-icon" />
+          <span>{displayEmail}</span>
+        </div>
       </div>
     )
   }
+
+  render() {
+    const { isLoading, error } = this.state
+    
+    if (isLoading) {
+      return this.renderLoader()
+    }
+
+    if (error) {
+      return this.renderError()
+    }
+    
+    return this.renderProfile()
+  }
 }
+
 export default Profile
