@@ -4,7 +4,8 @@ import Cookies from 'js-cookie'
 import { TailSpin } from 'react-loader-spinner'
 import { FiStar } from 'react-icons/fi'
 import { BsBriefcase } from 'react-icons/bs'
-import { MdLocationOn } from 'react-icons/md'
+import { MdLocationOn, MdAccessTime, MdWork, MdCheckCircle, MdBusiness, MdLink, MdSend } from 'react-icons/md'
+import { FaRegCalendarAlt, FaBriefcase } from 'react-icons/fa'
 import NavBar from '../NavBar'
 import FailureView from '../FailureView'
 import apiService from '../../services/api'
@@ -115,14 +116,15 @@ class JobDetails extends Component {
             <div className="meta-left">
               <span><MdLocationOn /> {location}</span>
               <span><BsBriefcase /> {getEmploymentTypeLabel()}</span>
-              <span>📅 {date_posted}</span>
-              <span>⏰ Deadline: {deadline}</span>
+              <span><FaRegCalendarAlt /> {date_posted}</span>
+              <span><MdAccessTime /> Deadline: {deadline}</span>
             </div>
             <p className="meta-salary">{package_per_annum}</p>
           </div>
           
           <div className="experience-badge">
-            💼 Experience Required: {experience_required}
+            <MdWork className="experience-icon" />
+            Experience Required: {experience_required}
           </div>
           
           <hr className="divider" />
@@ -131,7 +133,9 @@ class JobDetails extends Component {
             <div className="description-header">
               <h3>Description</h3>
               <a href={company_website_url} target="_blank" rel="noreferrer" className="visit-link">
+                <MdBusiness className="link-icon" />
                 Visit Company Website
+                <MdLink className="external-icon" />
               </a>
             </div>
             <p>{job_description}</p>
@@ -143,7 +147,8 @@ class JobDetails extends Component {
               <ul className="requirements-list">
                 {requirements.map((req, index) => (
                   <li key={index}>
-                    ✅ {req}
+                    <MdCheckCircle className="check-icon" />
+                    {req}
                   </li>
                 ))}
               </ul>
@@ -177,6 +182,7 @@ class JobDetails extends Component {
               className="apply-button"
               onClick={() => window.open(company_website_url, '_blank')}
             >
+              <MdSend className="apply-icon" />
               Apply Now
             </button>
           </div>
@@ -184,7 +190,10 @@ class JobDetails extends Component {
         
         {similarJobs.length > 0 && (
           <>
-            <h2 className="similar-jobs-title">Similar Jobs</h2>
+            <h2 className="similar-jobs-title">
+              <FaBriefcase className="title-icon" />
+              Similar Jobs
+            </h2>
             <div className="similar-jobs-container">
               {similarJobs.map(job => (
                 <div 
