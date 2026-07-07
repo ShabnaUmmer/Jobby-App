@@ -35,7 +35,7 @@ A modern, responsive job portal built with **React.js** that lets users search, 
 
 ### Prerequisites
 
-- Node.js (v14 or higher)
+- React.js
 - npm or yarn
 
 ### Installation
